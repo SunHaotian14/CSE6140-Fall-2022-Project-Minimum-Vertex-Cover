@@ -9,6 +9,9 @@ import os
 import numpy as np
 from graph import Graph
 
+DATA_PATH = './DATA/'
+OUTPUT_PATH = './output/'
+
 # load the graph from the graph file
 def load_graph(graph_file):
     """
@@ -27,7 +30,7 @@ def load_graph(graph_file):
     """
     if not graph_file.endswith('.graph'):
         graph_file = graph_file + '.graph'
-    graph_path = './DATA/' + graph_file
+    graph_path = DATA_PATH + graph_file
     graph = Graph()
     with open(graph_path, 'rb') as file:
         temp = file.readline().split()
@@ -40,27 +43,40 @@ def load_graph(graph_file):
     return graph
 
 # write the results to the output file
-def write_output(graph, output_file, solution, trace):
+def write_output(config, solution, trace):
     """
     Write the results to the output file
 
     Parameters
     ----------
-    graph : Graph
-        The graph object of the predefined Graph class
+
     output_file : str
         The file name of the output file
-    solution : list
-        TODO
-    trace : list
-        TODO
+    solution : list recording the found solution, in the format of:
+        - line 1: quality of best solution found (integer)
+        - lines 2: list of vertex IDs of the vertex cover (comma-separated)
+    trace : list recording the trace of the algorithm, in the format of:
+        - A timestamp in seconds (double)
+        - Quality of the best found solution at that point in time (integer).
 
     """
+    output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
+                + str(config['cutoff_time']) + '_' + str(config['seed']) + '.sol'
     with open(output_file, 'w') as f:
         # write the solution
-        # TODO: write the solution to the output file
-        pass
-
+        f.write(str(len(solution)))
+        f.write('\n')
+        f.write(','.join(map(str, solution)))
+    
+    output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
+                + str(config['cutoff_time']) + '_' + str(config['seed']) + '.trace'
+    with open(output_file, 'w') as f:
+        # write the trace
+        for t in trace:
+            f.write(','.join(map(str, t)))
+            f.write('\n')
+        
+# load trace and solution from the output file
 def load_results(result_file):
     """
     Load the results from the output file
@@ -80,11 +96,25 @@ def load_results(result_file):
     """
     # TODO
 
+# get all graph files in the DATA_PATH
+def get_graph_files():
+    """
+    Get all graph files in the DATA_PATH
+
+    Returns
+    -------
+    graph_files : list
+        The list of graph files
+
+    """
+    graph_files = os.listdir(DATA_PATH)
+    graph_files = list(filter(lambda x: x.endswith('.graph'), graph_files))
+    return graph_files
 
 # Only for debugging purpose
 if __name__ == '__main__':
     # load the graph
     print(os.getcwd())
-    graph = load_graph('hep-th')
-    # graph.show()
+    print(len(get_graph_files()))
+
    

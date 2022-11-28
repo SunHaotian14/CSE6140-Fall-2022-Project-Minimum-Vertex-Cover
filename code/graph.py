@@ -4,6 +4,7 @@ This file defines the graph class based on networkx and some essential operation
 
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib
 
 # Create a wrapper class for networkx graph object and add some essential operations.
 class Graph:
@@ -38,8 +39,8 @@ class Graph:
             self.g.add_edges_from([(from_node, to_node) for to_node in to_nodes])
 
     # get the list of nodes connected with the input node
-    def get_neighbors(self, node):
-        return self.g.neighbors(node)
+    def get_neighbors_as_list(self, node):
+        return list(self.g.neighbors(node))
 
     # get the total number of nodes in the graph
     def get_num_nodes(self):
@@ -49,8 +50,29 @@ class Graph:
     def get_num_edges(self):
         return self.g.number_of_edges()
     
+    # get the set of nodes in the graph (copied object)
+    def get_vertices_set(self):
+        return set(self.g.nodes()).copy()
+
+    # determine whether the graph is empty
+    def is_empty(self):
+        return self.g.number_of_nodes() == 0
+    
+    # delete the input nodes from the graph
+    def delete_nodes_from_set(self, node_set):
+        self.g.remove_nodes_from(iter(node_set))
+
+    # get the node with the minimum degree
+    def get_node_with_min_degree(self):
+        return min(self.g, key=self.g.degree)
+
+    # get the deep copy of the graph
+    def copy(self):
+        return Graph(self.g.copy())
+    
     # draw the graph (debugging purpose)
     def show(self):
         plt.figure()
-        nx.draw(self.g)
+        nx.draw(self.g, with_labels=True)
+        plt.show()
         plt.show()
