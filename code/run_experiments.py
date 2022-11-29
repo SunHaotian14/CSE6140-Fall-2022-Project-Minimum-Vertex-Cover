@@ -7,9 +7,10 @@ This file contains functions to conduct the experiments, which can:
 import argparse
 import os
 from heuristics import heuristic
+from BnB import branch_and_bound
 from io_utils import load_graph, write_output, load_results, get_graph_files
 
-ALGORITHM_LIST = {'heuristic': heuristic, 'BnB': None, 'LS1': None, 'LS2': None}
+ALGORITHM_LIST = {'heuristic': heuristic, 'BnB': branch_and_bound, 'LS1': None, 'LS2': None}
 
 # run single experiment with the given configuration
 def single_round_experiment(config):
