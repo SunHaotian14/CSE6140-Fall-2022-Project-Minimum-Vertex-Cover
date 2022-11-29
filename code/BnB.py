@@ -4,8 +4,11 @@ import sys
 
 
 def branch_and_bound(graph, cut_off_time=600):
-    # Let us assume that graph is an object defined by networkx.
-    # Until Sun Zhu Tou has make all adjustments to the object Graph.
+    """
+    Branch and Bound Method.
+    :param graph: Graph object
+    :param cut_off_time: int (600 by default)
+    """
 
     start_time = time.time()
     graph_temp = graph.copy()
