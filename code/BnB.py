@@ -28,7 +28,7 @@ def branch_and_bound(graph, cut_off_time=600):
 
     def _backtracking(cover, cover_n, subgraph, n_edge_subgraph):
         """
-
+        Backtracking iteration.
         :param cover: set
         :param cover_n: int
         :param subgraph: Graph
@@ -38,20 +38,23 @@ def branch_and_bound(graph, cut_off_time=600):
         # cut-off condition:
         if time.time() - start_time > cut_off_time:
             return
+        # nonlocal best_cover, upper_bound
         nonlocal best_cover, trace, upper_bound
         if n_edge_subgraph == 0:
             if len(cover) < upper_bound:
-                best_cover = cover
+                best_cover = cover.copy()
+                upper_bound = len(best_cover)
+                # upper_bound = n_vertices
                 trace.append([time.time() - start_time, upper_bound])
             return
 
         # Find the vertex that has not been covered that has the most degree.
         next_vertex = None
         max_degree = None
-        for vertex in graph_temp.g.nodes:
-            if vertex not in cover and graph_temp.g.degree[vertex] > 0:
-                if max_degree is None or max_degree < graph_temp.g.degree[vertex]:
-                    max_degree = graph_temp.g.degree[vertex]
+        for vertex in subgraph.g.nodes:
+            if vertex not in cover and subgraph.g.degree[vertex] > 0:
+                if max_degree is None or max_degree < subgraph.g.degree[vertex]:
+                    max_degree = subgraph.g.degree[vertex]
                     next_vertex = vertex
         if max_degree is None:
             # Then all the vertices are included in the cover.
