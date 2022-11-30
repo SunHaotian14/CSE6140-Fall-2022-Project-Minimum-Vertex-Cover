@@ -14,7 +14,7 @@ def local_search_1(graph, seed, cutoff_time):
         return p
 
     random.seed(seed)
-    start_time = time.time()
+
     alpha = 0.99  # temp decrease rate
     T0 = 1000  # initial temp
     T = T0
@@ -28,10 +28,13 @@ def local_search_1(graph, seed, cutoff_time):
     num_whole_node = graph.get_num_nodes()
 
     cov = set(list(all_nodes))
-    uncov = set()  # record uncovered edges
+    uncov = set()
     score = cost_f(0, num_whole_node)
     best_score = score
-    trace = [str(round(time.time() - start_time, 2)) + ' ' + str(best_score)]  # trace file content
+    start_time = time.time()
+    trace = []
+    trace.append([time.time() - start_time, score])
+    # trace = [str(round(time.time() - start_time, 2)) + ' ' + str(best_score)]  # trace file content
     solution = cov.copy()
 
     while (time.time() - start_time) < cutoff_time:
@@ -76,7 +79,7 @@ def local_search_1(graph, seed, cutoff_time):
         if not len(uncov):
             if score < best_score:
                 best_score = score
-                trace.append(str(round(time.time() - start_time, 2)) + ' ' + str(best_score))
+                trace.append([time.time() - start_time, score])
                 solution = cov.copy()
             else:
                 fail += 1
