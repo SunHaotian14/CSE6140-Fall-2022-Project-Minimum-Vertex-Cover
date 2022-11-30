@@ -20,7 +20,7 @@ def local_search_1(graph, seed, cutoff_time):
     T = T0
     threshold = 5
     fail = 0
-    tolerance = max(int(graph.get_num_nodes() * 0.3), 1000)
+    tolerance = max(int(graph.get_num_nodes() * 0.5), 1500)
     down = 0
 
     all_nodes, original_v = graph.get_vertices_set(), graph.get_vertices_set()
@@ -33,10 +33,11 @@ def local_search_1(graph, seed, cutoff_time):
     best_score = score
     trace = [str(round(time.time() - start_time, 2)) + ' ' + str(best_score)]  # trace file content
     solution = cov.copy()
-    print('SA...')
+
     while (time.time() - start_time) < cutoff_time:
         if down > tolerance:
-            break
+            # break
+            pass
         # pick a random node
         node = random.sample(original_v, 1)[0]
         former_cov = cov.copy()
@@ -82,7 +83,8 @@ def local_search_1(graph, seed, cutoff_time):
             if threshold <= fail:
                 fail = 0
                 T = T0
-    print(len(solution))
+    print("Answer:", len(solution))
+    print("Time Cost:", (time.time() - start_time))
     return solution, trace
 
 
