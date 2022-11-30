@@ -54,6 +54,10 @@ class Graph:
     def get_vertices_set(self):
         return set(self.g.nodes()).copy()
 
+    # get the set of edges in the graph (copied object)
+    def get_edges_set(self):
+        return set(self.g.edges()).copy()
+
     # determine whether the graph is empty
     def is_empty(self):
         return self.g.number_of_nodes() == 0
