@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import heapq
+#from io_utils import load_graph
 
 def local_search_2(graph, seed, cutoff_time):
 
@@ -12,33 +13,30 @@ def local_search_2(graph, seed, cutoff_time):
         return True
 
     nodes = graph.get_vertices_set()
-    num_whole_edge = graph.get_num_edges()
-    num_whole_node = graph.get_num_nodes()
-    cov = set(list(nodes))
-    uncov = set()
+    operation_graph = graph.copy() # operations of the graph are done on a copy of the graph
     
-
-    heap = [(len(graph.get_neighbors_as_list(node)), node) for node in nodes] # create heap
-    heap = heapq.heapify(heap)
+    heap = [(len(operation_graph.get_neighbors_as_list(node)), node) for node in nodes] # create heap
+    heapq.heapify(heap)
 
     trace = []
-
     start_time = time.time()
 
     while (time.time() - start_time) < cutoff_time:
-        trace.append((time.time()-start_time, graph.get_num_nodes()))
+        trace.append((time.time()-start_time, operation_graph.get_num_nodes()))
 
         # every iteration, delete the smallest possible degree node 
         while(True):
             if len(heap)==0:
-                return graph.get_vertices_set(), trace
-            graph_test = graph.copy()
+                return operation_graph.get_vertices_set(), trace
+            graph_test = operation_graph.copy()
             min_node = heapq.heappop(heap)
-            graph_test.delete_nodes_from_set(min_node)
-            if check_cover(graph_test):
-                graph.delete_nodes_from_set(min_node)
+            graph_test.delete_nodes_from_set([min_node[1]]) # try to delete the node with min degree
+            if check_cover(graph_test, graph):
+                operation_graph.delete_nodes_from_set([min_node[1]])
                 break
             else: 
                 continue
 
-    return cov, trace
+
+#G = load_graph('dummy2')
+#print(local_search_2(G,1,1000))
