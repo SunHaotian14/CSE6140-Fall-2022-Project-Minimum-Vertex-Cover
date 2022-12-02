@@ -43,7 +43,7 @@ def load_graph(graph_file):
     return graph
 
 # write the results to the output file
-def write_output(config, solution, trace):
+def write_output(config, solution, trace, OUTPUT_PATH=OUTPUT_PATH, T0_P=None):
     """
     Write the results to the output file
 
@@ -60,7 +60,11 @@ def write_output(config, solution, trace):
         - Quality of the best found solution at that point in time (integer).
 
     """
-    output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
+    if T0_P:
+        output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
+                + str(config['cutoff_time']) + '_' + str(config['seed']) + '_' + str(T0_P) +'.sol'
+    else:
+        output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
                 + str(config['cutoff_time']) + '_' + str(config['seed']) + '.sol'
     with open(output_file, 'w') as f:
         # write the solution
@@ -68,7 +72,11 @@ def write_output(config, solution, trace):
         f.write('\n')
         f.write(','.join(map(str, solution)))
     
-    output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
+    if T0_P:
+        output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
+                + str(config['cutoff_time']) + '_' + str(config['seed']) + '_' + str(T0_P) +'.trace'
+    else:
+        output_file = OUTPUT_PATH + config['graph'] + '_' + config['algorithm'] + '_' \
                 + str(config['cutoff_time']) + '_' + str(config['seed']) + '.trace'
     with open(output_file, 'w') as f:
         # write the trace
