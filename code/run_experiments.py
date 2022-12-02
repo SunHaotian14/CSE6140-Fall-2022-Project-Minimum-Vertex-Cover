@@ -64,4 +64,6 @@ if __name__ == '__main__':
     # load the graph
     print(os.getcwd())
     # run_experiments()
-    verify_solutions()
+    # verify_solutions()
+    config = {'graph': 'delaunay_n10', 'algorithm': 'heuristic', 'seed': 1, 'cutoff_time': 600}
+    single_round_experiment(config)

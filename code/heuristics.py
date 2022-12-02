@@ -29,7 +29,6 @@ def heuristic(graph, cutoff_time=600):
     """
     start_time = time.time()
     solution = set()
-    trace = []
     graph_temp = graph.copy()
     while not graph_temp.is_empty() and time.time() - start_time < cutoff_time:
         # select the vertex with the minimum degree
@@ -42,7 +41,7 @@ def heuristic(graph, cutoff_time=600):
         neighbors.add(selected_node)
         graph_temp.delete_nodes_from_set(neighbors)
         # add the solution to the trace
-        trace.append([time.time() - start_time, len(solution)])
+    trace= [[time.time() - start_time, len(solution)]]
     solution = list(solution)
     
     return solution, trace
