@@ -3,7 +3,7 @@ import random
 import math
 
 
-def local_search_1(graph, seed, cutoff_time):
+def local_search_1(graph, seed, cutoff_time, T0_P=None):
     """
         local search 1：Simulated Annealing
     """
@@ -54,7 +54,10 @@ def local_search_1(graph, seed, cutoff_time):
     all_nodes, original_v = graph.get_vertices_set(), graph.get_vertices_set()
     num_whole_edge = graph.get_num_edges()
     num_whole_node = graph.get_num_nodes()
-    T0 = num_whole_edge * 200 + 1000
+    if T0_P is None:
+        T0 = num_whole_edge * 200 + 1000
+    else:
+        T0 = num_whole_edge * T0_P + 1000
     T = T0
 
     uncov, cov = empty_init(graph)
