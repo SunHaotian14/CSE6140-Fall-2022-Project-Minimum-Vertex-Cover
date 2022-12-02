@@ -10,7 +10,9 @@ from heuristics import heuristic
 from BnB import branch_and_bound
 from local_search_1 import local_search_1
 from local_search_2 import local_search_2
-from io_utils import load_graph, write_output, load_results, get_graph_files
+from io_utils import load_graph, write_output, get_graph_files
+from evaluation_tools import verify_solutions
+
 
 ALGORITHM_LIST = {'heuristic': heuristic, 'BnB': branch_and_bound, 'LS1': local_search_1, 'LS2': local_search_2}
 
@@ -61,4 +63,5 @@ def parse_args():
 if __name__ == '__main__':
     # load the graph
     print(os.getcwd())
-    run_experiments()
+    # run_experiments()
+    verify_solutions()

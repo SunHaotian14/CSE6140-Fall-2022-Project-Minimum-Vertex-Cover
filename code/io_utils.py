@@ -76,25 +76,53 @@ def write_output(config, solution, trace):
             f.write(','.join(map(str, t)))
             f.write('\n')
         
-# load trace and solution from the output file
-def load_results(result_file):
+# load solution and trace from the output file
+def load_solution(sol_file):
     """
-    Load the results from the output file
+    Load the solution from the output file indicated by sol_file
 
     Parameters
     ----------
-    output_file : str
+    sol_file : str
         The file name of the output file
 
     Returns
     -------
     solution : list
-        TODO
-    trace : list
-        TODO
+        The list of vertex IDs of the vertex cover
 
     """
-    # TODO
+    if not sol_file.endswith('.sol'):
+        sol_file = sol_file + '.sol'
+    sol_path = OUTPUT_PATH + sol_file
+    with open(sol_path, 'r') as f:
+        num_sol = list(map(int, f.readline().split(',')))[0]
+        solution = list(map(int, f.readline().split(',')))
+    return num_sol, solution
+
+def load_trace(trace_file):
+    """
+    Load the trace from the output file indicated by trace_file
+
+    Parameters
+    ----------
+    trace_file : str
+        The file name of the output file
+
+    Returns
+    -------
+    trace : list
+        The list of trace
+
+    """
+    if not trace_file.endswith('.trace'):
+        trace_file = trace_file + '.trace'
+    trace = np.array([])
+    trace_path = OUTPUT_PATH + trace_file
+    with open(trace_path, 'r') as f:
+        trace = np.array([list(map(float, line.split(','))) for line in f])
+    return trace
+    
 
 # get all graph files in the DATA_PATH
 def get_graph_files():
@@ -109,12 +137,30 @@ def get_graph_files():
     """
     graph_files = os.listdir(DATA_PATH)
     graph_files = list(filter(lambda x: x.endswith('.graph'), graph_files))
+    graph_files = list(map(lambda x: x.removesuffix('.graph'), graph_files))
     return graph_files
+
+# get all output files in the OUTPUT_PATH
+def get_solution_files():
+    """
+    Get all solution files in the OUTPUT_PATH
+
+    Returns
+    -------
+    output_files : list
+        The list of output files
+
+    """
+    output_files = os.listdir(OUTPUT_PATH)
+    output_files = list(filter(lambda x: x.endswith('.sol'), output_files))
+    output_files = list(map(lambda x: x.removesuffix('.sol'), output_files))
+    return output_files
 
 # Only for debugging purpose
 if __name__ == '__main__':
     # load the graph
     print(os.getcwd())
-    print(len(get_graph_files()))
+    print(get_graph_files())
+    print(load_trace('as-22july06.graph_heuristic_600_1'))
 
    
