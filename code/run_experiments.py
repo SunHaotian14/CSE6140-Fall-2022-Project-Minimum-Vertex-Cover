@@ -69,7 +69,7 @@ def run_experiments():
     #   Graph: power.graph, star2.graph
     #   Seed: 2, 3, 4, 5, 6, 7, 8, 9, 10
     #   Cutoff: 600
-    graph_list = ['power.graph', 'star2.graph']
+    graph_list = ['power', 'star2']
     seed_list = [2, 3, 4, 5, 6, 7, 8, 9, 10]
     for graph in graph_list:
         for seed in seed_list:
