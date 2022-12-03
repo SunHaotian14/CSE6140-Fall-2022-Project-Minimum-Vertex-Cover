@@ -16,6 +16,8 @@ from evaluation_tools import verify_solutions
 
 ALGORITHM_LIST = {'heuristic': heuristic, 'BnB': branch_and_bound, 'LS1': local_search_1, 'LS2': local_search_2}
 
+def get_algorithm_list():
+    return ALGORITHM_LIST
 
 # run single experiment with the given configuration
 def single_round_experiment(config, T0_P = None):
@@ -101,5 +103,4 @@ if __name__ == '__main__':
     # load the graph
     print(os.getcwd())
     run_experiments()
-    verify_solutions()
 

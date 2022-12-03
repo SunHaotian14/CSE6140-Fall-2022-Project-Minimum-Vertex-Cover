@@ -5,10 +5,18 @@ This file contains some support functions for evaluation, i.e.,
 - plotting the Solution Quality Distributions for various run-times (SQDs);
 - box plotting for running time comparison.
 """
-
+import numpy as np
+import pandas as pd
 from pandas import DataFrame as df
 from matplotlib import pyplot as plt
 from io_utils import load_graph, load_solution, load_trace, get_graph_files, get_solution_files
+
+PLOTS_PATH = './plots/'
+
+ALGORITHM_NAME_LIST = {'heuristic', 'BnB', 'LS1', 'LS2'}
+
+OPT_SOL = {'jazz': 158, 'karate': 14, 'football': 94, 'as-22july06': 3303, 'hep-th': 3926, 'star': 6902,\
+            'star2': 4542, 'netscience': 899, 'email': 594, 'delaunay_n10': 703, 'power': 2203, 'dummy1': 2, 'dummy2': 3}
 
 def verify_solutions():
     """
@@ -47,7 +55,7 @@ def verify_solutions():
     if qualified:
         print('All the solutions are qualified!')
 
-def results_table():
+def get_results_table():
     """
     Formulate a comprehensive table to present the results from different algorithms
 
@@ -57,29 +65,145 @@ def results_table():
         The comprehensive table of the results
 
     """
-    # TODO the table should contain the following columns:
+    df_list = {}
+    for algorithm in ALGORITHM_NAME_LIST:
+        results = []
+        for graph in get_graph_files():
+            file_name = graph + '_' + algorithm + '_' \
+                + str(600) + '_' + str(1)
+            num_sol, _ = load_solution(file_name)
+            trace = load_trace(file_name)
+            if trace is None:
+                continue
+            time = trace[-1][0]
+            relative_error = (num_sol - OPT_SOL[graph]) / OPT_SOL[graph] * 100
+            results.append([time, num_sol, relative_error])
+        df_results = pd.DataFrame(results,
+                                    index=get_graph_files(),
+                                    columns=['Time (s)',  'VC Value', 'RelErr (\%)'])
+        df_results = df_results.sort_values(by=['VC Value'])
+        df_list[algorithm] = df_results
+    # print(df_list)
+    return df_list
 
-def QRTD_plot():
+def get_Ps(graph, algorithm, RT_leq, SQ_leq):
+    """
+    Calculate the probability that the solution quality is less than or equal to SQ_leq
+    and the runtime is less than or equal to RT_leq
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph
+    algorithm : str
+        The algorithm name
+    RT_leq : float
+        The runtime threshold
+    SQ_leq : int
+        The solution quality threshold
+    Returns
+    -------
+    P : float
+        The probability that the solution quality is less than or equal to SQ_leq
+        and the runtime is less than or equal to RT_leq
+
+    """
+    count = 0
+    for seed in range(1, 11):
+        file_name = graph + '_' + algorithm + '_' \
+                + str(600) + '_' + str(seed)
+        trace = load_trace(file_name)
+        if trace is None:
+            continue
+        time_q = np.array([np.array([record[0], (record[1] - OPT_SOL[graph]) / OPT_SOL[graph] * 100]) for record in trace])
+        # print(time_q)
+        count += np.logical_and(time_q[:, 0] <= RT_leq, time_q[:, 1] <= SQ_leq).any()
+    return count / 10
+
+
+
+def QRTD_plot(graph, algorithm, q_stars = list(range(10)), time_steps = list(range(10))):
     """
     Plot the Qualified Runtime for various solution qualities (QRTDs)
+    Parameters
+    ----------
+    graph : Graph
+        The graph
+    algorithm : str
+        The algorithm name
 
     """
-    # TODO
+    plt.figure()
+    for q_star in q_stars:
+        Ps = [get_Ps(graph, algorithm, RT_leq, q_star) for RT_leq in time_steps]
+        plt.plot(time_steps, Ps, label='q* = {}%'.format(q_star))
+    plt.grid(color='0.95', linestyle='-')
+    plt.xlabel('Runtime (s)')
+    plt.ylabel('P(solve)')
+    plt.title('QRTD for {} on {}'.format(algorithm, graph))
+    plt.legend()
+    plt.savefig(PLOTS_PATH + 'QRTD_{}_{}.png'.format(algorithm, graph))
+    plt.show()
 
-def SQD_plot():
+def SQD_plot(graph, algorithm, q_stars = list(range(10)), time_steps = list(range(10))):
     """
     Plot the Solution Quality Distributions for various run-times (SQDs)
-
+    Parameters
+    ----------
+    graph : Graph
+        The graph
+    algorithm : str
+        The algorithm name
     """
-    # TODO
+    # time_steps = list(range(start_time, end_time, ceil(end_time/num_time)))
+    plt.figure()
+    for RT_leq in time_steps:
+        Ps = [get_Ps(graph, algorithm, RT_leq, q_star) for q_star in q_stars]
+        plt.plot(q_stars, Ps, label='RT = {}s'.format(RT_leq))
+    plt.grid(color='0.95', linestyle='-')
+    plt.xlabel('Relative solution Quality (%)')
+    plt.ylabel('P(solve)')
+    plt.title('SQD for {} on {}'.format(algorithm, graph))
+    plt.legend()
+    plt.savefig(PLOTS_PATH + 'SQD_{}_{}.png'.format(algorithm, graph))
+    plt.show()
 
-def box_plot():
+
+def box_plot(graph, algorithm, q_star_range=[0, 1]):
     """
     Box plotting for running time comparison
 
     """
-    # TODO
+    results = []
+    for seed in range(1, 11):
+        file_name = graph + '_' + algorithm + '_' \
+                + str(600) + '_' + str(seed)
+        trace = load_trace(file_name)
+        if trace is None:
+            continue
+        time_q = np.array([np.array([record[0], (record[1] - OPT_SOL[graph]) / OPT_SOL[graph] * 100]) for record in trace])
+        results.append(time_q)
+    final_qs = [single_result[-1][1] for single_result in results]
+    print('The final solution qualities of each run are {}%'.format(sorted(final_qs)))
+    selected_RTs = []
+    for single_result in results:
+        for record in single_result:
+            if record[1] <= q_star_range[1] and record[1] >= q_star_range[0]:
+                selected_RTs.append(record[0])
+                break
+    print('The selected runtimes are {}s'.format(sorted(selected_RTs)))
+    plt.figure()
+    plt.boxplot(selected_RTs)
+    plt.grid(color='0.95', linestyle='-')
+    plt.xlabel(algorithm)
+    plt.ylabel('Runtime (s)')
+    plt.title('Box plot for {} on {}, within solution quality range [{}%, {}%]'.format(algorithm, graph, q_star_range[0], q_star_range[1]))
+    plt.savefig(PLOTS_PATH + 'Box_{}_{}_{}_{}.png'.format(algorithm, graph, q_star_range[0], q_star_range[1]))
+    plt.show()
+
 
 # for debugging purpose
 if __name__ == '__main__':
-    verify_solutions()
+    # get_results_table()
+    # get_Ps('power', 'LS1', 600, 8)
+    box_plot('power', 'LS1', [7,10])
