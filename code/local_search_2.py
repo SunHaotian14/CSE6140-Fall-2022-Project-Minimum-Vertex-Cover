@@ -47,8 +47,6 @@ def local_search_2(graph, initialize_ratio, seed, cutoff_time):
             return convert_to_set(covered_nodes), trace
         trace.append((time.time()-start_time, np.sum(covered_nodes)))
         #print(np.sum(covered_nodes))
-
-
     return convert_to_set(covered_nodes), trace
 
 #G = load_graph('star.graph')
