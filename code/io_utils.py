@@ -108,7 +108,7 @@ def load_solution(sol_file):
         solution = list(map(int, f.readline().split(',')))
     return num_sol, solution
 
-def load_trace(trace_file):
+def load_trace(trace_file, T0_P=None):
     """
     Load the trace from the output file indicated by trace_file
 
@@ -123,10 +123,14 @@ def load_trace(trace_file):
         The list of trace
 
     """
-    if not trace_file.endswith('.trace'):
-        trace_file = trace_file + '.trace'
+    if T0_P:
+        trace_path = OUTPUT_PATH + 'Exp_T0_P/' + trace_file + '_' + str(T0_P)
+    else:
+        trace_path = OUTPUT_PATH + trace_file
+    if not trace_path.endswith('.trace'):
+        trace_path = trace_path + '.trace'
     trace = np.array([])
-    trace_path = OUTPUT_PATH + trace_file
+    
     with open(trace_path, 'r') as f:
         trace = np.array([list(map(float, line.split(','))) for line in f])
     return trace
