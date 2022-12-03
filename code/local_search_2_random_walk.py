@@ -1,7 +1,7 @@
 import numpy as np
 import time
 import random
-from io_utils import load_graph
+#from io_utils import load_graph
 
 def local_search_2(graph, seed, cutoff_time):
 
@@ -20,11 +20,12 @@ def local_search_2(graph, seed, cutoff_time):
 
     while(True):
         trace.append((time.time()-start_time, len(cov)))
+        #print(len(cov))
         selected_node = random.choice(uncov)
         cov.append(selected_node)
         uncov.remove(selected_node)
         if check_cover(cov, graph):
             return cov, trace
 
-G = load_graph('dummy1.graph')
-print(local_search_2(G,1,1))
+#G = load_graph('star.graph')
+#print(local_search_2(G,1,1))
