@@ -14,7 +14,7 @@ from io_utils import load_graph, write_output, get_graph_files
 from evaluation_tools import verify_solutions
 
 
-ALGORITHM_LIST = {'heuristic': heuristic, 'BnB': branch_and_bound, 'LS1': local_search_1, 'LS2': local_search_2}
+ALGORITHM_LIST = {'Approx': heuristic, 'BnB': branch_and_bound, 'LS1': local_search_1, 'LS2': local_search_2}
 
 def get_algorithm_list():
     return ALGORITHM_LIST
@@ -34,7 +34,7 @@ def single_round_experiment(config, T0_P = None):
         .format(config['graph'], config['algorithm'], config['seed'], config['cutoff_time']))
     graph = load_graph(config['graph'])
     algorithm = ALGORITHM_LIST[config['algorithm']]
-    if algorithm in {ALGORITHM_LIST['heuristic'], ALGORITHM_LIST['BnB']}:
+    if algorithm in {ALGORITHM_LIST['Approx'], ALGORITHM_LIST['BnB']}:
         solution, trace = algorithm(graph, config['cutoff_time'])
     if algorithm == ALGORITHM_LIST['LS1']:
         solution, trace = algorithm(graph, config['seed'], config['cutoff_time'], T0_P)
@@ -51,13 +51,14 @@ def run_experiments():
     Run the experiments for all the algorithms and all the graphs
 
     """
+    seed = 1
+    cutoff_time = 600
+    """
     # EXP1: 
     #   Algorithm: heuristic, BnB, LS1, LS2
     #   Graph: all graphs
     #   Seed: 1
     #   Cutoff: 600
-    seed = 1
-    cutoff_time = 600
     graph_list = get_graph_files()
     for algorithm in ALGORITHM_LIST.keys():
         if algorithm == None:
@@ -92,15 +93,35 @@ def run_experiments():
             for T0_P in T0_P_list:
                 config = {'graph': graph, 'algorithm': 'LS1', 'seed': seed, 'cutoff_time': cutoff_time}
                 single_round_experiment(config, T0_P)
+    """
 
-# parse the command line arguments
-def parse_args():
-    # TODO
-    pass
+    # EXP4:
+    #   Algorithm: LS1
+    #   Graph: all graphs except power.graph and star2.graph
+    #   Seed: 2, 3, 4, 5, 6, 7, 8, 9, 10
+    #   Cutoff: 600
+    graph_list = set(get_graph_files()) - {'power', 'star2'}
+    seed_list = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+    for graph in graph_list:
+        for seed in seed_list:
+            config = {'graph': graph, 'algorithm': 'LS1', 'seed': seed, 'cutoff_time': cutoff_time}
+            single_round_experiment(config)
 
-# Only for debugging purpose
+# execute the experiments according to the command line arguments
+def exec():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-inst', type=str, default=None, help='The graph file name', required=True)
+    parser.add_argument('-alg', type=str, default=None, help='The algorithm name', required=True)
+    parser.add_argument('-time', type=str, default=None, help='The cutoff time', required=True)   
+    parser.add_argument('-seed', type=int, default=1, help='The random seed', required=True)
+    args = parser.parse_args()
+    assert args.inst in get_graph_files(), 'The graph file does not exist'
+    assert args.alg in ALGORITHM_LIST.keys(), 'The algorithm does not exist'
+    config = {'graph': args.inst, 'algorithm': args.alg, 'seed': args.seed, 'cutoff_time': int(args.time)}
+    single_round_experiment(config)
+
 if __name__ == '__main__':
-    # load the graph
-    print(os.getcwd())
-    run_experiments()
+    # run_experiments()
+    # verify_solutions()
+    exec()
 

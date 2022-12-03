@@ -106,7 +106,4 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
                     trace.append([time.time() - start_time, score])
                     solution = cov.copy()
         T *= alpha
-
-    print("Answer:", len(solution))
-    print("Time Cost:", (time.time() - start_time))
     return solution, trace

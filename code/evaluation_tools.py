@@ -12,11 +12,11 @@ from matplotlib import pyplot as plt
 from io_utils import load_graph, load_solution, load_trace, get_graph_files, get_solution_files
 
 PLOTS_PATH = './plots/'
-
 ALGORITHM_NAME_LIST = {'heuristic', 'BnB', 'LS1', 'LS2'}
-
 OPT_SOL = {'jazz': 158, 'karate': 14, 'football': 94, 'as-22july06': 3303, 'hep-th': 3926, 'star': 6902,\
             'star2': 4542, 'netscience': 899, 'email': 594, 'delaunay_n10': 703, 'power': 2203, 'dummy1': 2, 'dummy2': 3}
+T0_P_LIST = [50, 200, 400]
+
 
 def verify_solutions():
     """
@@ -69,21 +69,23 @@ def get_results_table():
     for algorithm in ALGORITHM_NAME_LIST:
         results = []
         for graph in get_graph_files():
-            file_name = graph + '_' + algorithm + '_' \
-                + str(600) + '_' + str(1)
-            num_sol, _ = load_solution(file_name)
-            trace = load_trace(file_name)
-            if trace is None:
-                continue
-            time = trace[-1][0]
-            relative_error = (num_sol - OPT_SOL[graph]) / OPT_SOL[graph] * 100
-            results.append([time, num_sol, relative_error])
+            dummy = np.zeros((10, 3))
+            for seed in range(1, 11):
+                file_name = graph + '_' + algorithm + '_' \
+                    + str(600) + '_' + str(1)
+                num_sol, _ = load_solution(file_name)
+                trace = load_trace(file_name)
+                if trace is None:
+                    continue
+                time = trace[-1][0]
+                relative_error = (num_sol - OPT_SOL[graph]) / OPT_SOL[graph] * 100
+                dummy[seed - 1, :] = [time, num_sol, relative_error]
+            results.append(dummy.mean(axis = 0))
         df_results = pd.DataFrame(results,
                                     index=get_graph_files(),
-                                    columns=['Time (s)',  'VC Value', 'RelErr (\%)'])
+                                    columns=['Time (s)',  'VC Value', 'RelErr (%)'])
         df_results = df_results.sort_values(by=['VC Value'])
         df_list[algorithm] = df_results
-    # print(df_list)
     return df_list
 
 def get_Ps(graph, algorithm, RT_leq, SQ_leq):
@@ -168,7 +170,6 @@ def SQD_plot(graph, algorithm, q_stars = list(range(10)), time_steps = list(rang
     plt.savefig(PLOTS_PATH + 'SQD_{}_{}.png'.format(algorithm, graph))
     plt.show()
 
-
 def box_plot(graph, algorithm, q_star_range=[0, 1]):
     """
     Box plotting for running time comparison
@@ -201,9 +202,76 @@ def box_plot(graph, algorithm, q_star_range=[0, 1]):
     plt.savefig(PLOTS_PATH + 'Box_{}_{}_{}_{}.png'.format(algorithm, graph, q_star_range[0], q_star_range[1]))
     plt.show()
 
+def get_exp_T0P_table():
+    """
+    Get the table of experiment of T0P for LS1 on each graph
+
+    """
+    algorithm = 'LS1'
+    df_list = {}
+    for T0_P in T0_P_LIST:
+        results = []
+        for graph in get_graph_files():
+            dummy = np.zeros((3, 3))
+            for seed in range(1, 4):
+                file_name = graph + '_' + algorithm + '_' \
+                    + str(600) + '_' + str(seed)
+                if T0_P != 200:
+                    trace = load_trace(file_name, T0_P)
+                else:
+                    trace = load_trace(file_name)
+                if trace is None:
+                    continue
+                time, num_sol = trace[-1][0], trace[-1][1]
+                relative_error = (num_sol - OPT_SOL[graph]) / OPT_SOL[graph] * 100
+                dummy[seed - 1, :] = [time, num_sol, relative_error]
+            results.append(dummy.mean(axis = 0))
+        df_results = pd.DataFrame(results,
+                                index=get_graph_files(),
+                                columns=['Time (s)',  'VC Value', 'RelErr (%)'])
+        df_results = df_results.sort_values(by=['VC Value'])
+        df_list[T0_P] = df_results
+    return df_list
+
+def T0_P_trace_plot(graph):
+    """
+    Plot the trace of T0P for LS1 on given graph
+
+    Parameters
+    ----------
+    graph : Graph
+        The graph
+    T0_P : int
+        The T0_P value
+    """
+    algorithm = 'LS1'
+    seed = 1
+    
+    file_name = graph + '_' + algorithm + '_' \
+                + str(600) + '_' + str(seed)
+    plt.figure()
+    for T0_P in T0_P_LIST:
+        if T0_P != 200:
+            trace = load_trace(file_name, T0_P)
+        else:
+            trace = load_trace(file_name)
+        if trace is None:
+            continue
+        time_q = np.array([np.array([record[0], (record[1] - OPT_SOL[graph]) / OPT_SOL[graph] * 100]) for record in trace])
+        plt.plot(time_q[:, 0], time_q[:, 1], label='T0_P = {}'.format(T0_P))
+    plt.grid(color='0.95', linestyle='-')
+    plt.xlabel('Runtime (s)')
+    plt.ylabel('Relative solution Quality (%)')
+    plt.title('Trace plot for {} on {}'.format(algorithm, graph))
+    plt.legend()
+    plt.savefig(PLOTS_PATH + 'Trace_{}_{}.png'.format(algorithm, graph))
+    plt.show()
+
 
 # for debugging purpose
 if __name__ == '__main__':
     # get_results_table()
     # get_Ps('power', 'LS1', 600, 8)
-    box_plot('power', 'LS1', [7,10])
+    # box_plot('power', 'LS1', [7,10])
+    # print(get_exp_T0P_table())
+    pass
