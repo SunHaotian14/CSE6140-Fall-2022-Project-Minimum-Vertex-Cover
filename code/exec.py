@@ -39,7 +39,7 @@ def single_round_experiment(config, T0_P = None):
     if algorithm == ALGORITHM_LIST['LS1']:
         solution, trace = algorithm(graph, config['seed'], config['cutoff_time'], T0_P)
     if algorithm == ALGORITHM_LIST['LS2']:
-        solution, trace = algorithm(graph, 0.1, config['seed'], config['cutoff_time'])
+        solution, trace = algorithm(graph, config['seed'], config['cutoff_time'])
     if T0_P:
         write_output(config, solution, trace, OUTPUT_PATH='./output/Exp_T0_P/', T0_P=T0_P)
     else:
@@ -105,7 +105,7 @@ def run_experiments():
         for seed in seed_list:
             config = {'graph': graph, 'algorithm': 'LS1', 'seed': seed, 'cutoff_time': cutoff_time}
             single_round_experiment(config)
-    
+    """
 
     # EXP5:
     #   Algorithm: LS2
@@ -118,11 +118,7 @@ def run_experiments():
         for seed in seed_list:
             config = {'graph': graph, 'algorithm': 'LS2', 'seed': seed, 'cutoff_time': cutoff_time}
             single_round_experiment(config)
-    """
-    graph_list = get_graph_files()
-    for graph in graph_list:
-        config = {'graph': graph, 'algorithm': 'Approx', 'seed': seed, 'cutoff_time': cutoff_time}
-        single_round_experiment(config)
+    
 
 # execute the experiments according to the command line arguments
 def exec():

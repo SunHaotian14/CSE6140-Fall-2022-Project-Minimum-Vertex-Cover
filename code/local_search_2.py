@@ -17,8 +17,6 @@ def local_search_2(graph, seed, cutoff_time):
             if l: result.add(i+1)
         return result
 
-
-
     np.random.seed(seed)
     nodes = graph.get_vertices_set()
     nodes_num = graph.get_num_nodes()

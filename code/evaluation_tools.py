@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 from io_utils import load_graph, load_solution, load_trace, get_graph_files, get_solution_files
 
 PLOTS_PATH = './plots/'
-ALGORITHM_NAME_LIST = {'heuristic', 'BnB', 'LS1', 'LS2'}
+ALGORITHM_NAME_LIST = {'Approx', 'BnB', 'LS1', 'LS2'}
 OPT_SOL = {'jazz': 158, 'karate': 14, 'football': 94, 'as-22july06': 3303, 'hep-th': 3926, 'star': 6902,\
             'star2': 4542, 'netscience': 899, 'email': 594, 'delaunay_n10': 703, 'power': 2203, 'dummy1': 2, 'dummy2': 3}
 T0_P_LIST = [50, 200, 400]
@@ -194,7 +194,22 @@ def box_plot(graph, algorithm, q_star_range=[0, 1]):
                 break
     print('The selected runtimes are {}s'.format(sorted(selected_RTs)))
     plt.figure()
-    plt.boxplot(selected_RTs)
+    bp_dict = plt.boxplot(selected_RTs, showmeans=True)
+    for line in bp_dict['medians']:
+        x, y = line.get_xydata()[0] 
+        plt.text(x, y, 'median: {:.2f}'.format(y), horizontalalignment='right', verticalalignment='bottom')
+    for line in bp_dict['boxes']:
+        x, y = line.get_xydata()[0]
+        plt.text(x, y, 'Q3: {:.2f}'.format(y), horizontalalignment='right', verticalalignment='bottom')
+        x, y = line.get_xydata()[3]
+        plt.text(x, y, 'Q1: {:.2f}'.format(y), horizontalalignment='right', verticalalignment='bottom')
+    for idx, line in enumerate(bp_dict['caps']):
+        if idx:
+            x, y = line.get_xydata()[0]
+            plt.text(x, y, 'max: {:.2f}'.format(y), horizontalalignment='right', verticalalignment='bottom')
+        else:
+            x, y = line.get_xydata()[0]
+            plt.text(x, y, 'min: {:.2f}'.format(y), horizontalalignment='right', verticalalignment='bottom')
     plt.grid(color='0.95', linestyle='-')
     plt.xlabel(algorithm)
     plt.ylabel('Runtime (s)')
