@@ -63,7 +63,8 @@ def local_search_2(graph, seed, cutoff_time):
 
         if not check_cover(covered_nodes, graph):
             covered_nodes[min_node-1] = 1 #restore
-        trace.append((time.time()-start_time, np.sum(covered_nodes)))
+        else:
+            trace.append((time.time()-start_time, np.sum(covered_nodes)))
         #print(np.sum(covered_nodes))
     print("Timeout!")
     return convert_to_set(covered_nodes), trace
