@@ -1,13 +1,17 @@
+"""
+This file contains the implementation of a Branch-and-Bound (BnB) for MVC problem.
+"""
 import time
 import math
 import sys
-
 
 def branch_and_bound(graph, cut_off_time=600):
     """
     Branch and Bound Method.
     :param graph: Graph object
     :param cut_off_time: int (600 by default)
+
+    :return: best_cover, trace
     """
 
     start_time = time.time()
@@ -33,7 +37,7 @@ def branch_and_bound(graph, cut_off_time=600):
         :param cover_n: int
         :param subgraph: Graph
         :param n_edge_subgraph: int
-        :return:
+
         """
         # cut-off condition:
         if time.time() - start_time > cut_off_time:

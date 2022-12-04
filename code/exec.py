@@ -53,7 +53,7 @@ def run_experiments():
     """
     seed = 1
     cutoff_time = 600
-    """
+
     # EXP1: 
     #   Algorithm: heuristic, BnB, LS1, LS2
     #   Graph: all graphs
@@ -105,7 +105,6 @@ def run_experiments():
         for seed in seed_list:
             config = {'graph': graph, 'algorithm': 'LS1', 'seed': seed, 'cutoff_time': cutoff_time}
             single_round_experiment(config)
-    """
 
     # EXP5:
     #   Algorithm: LS2
@@ -134,7 +133,7 @@ def exec():
     single_round_experiment(config)
 
 if __name__ == '__main__':
-    run_experiments()
-    verify_solutions()
-    # exec()
+    # run_experiments()
+    # verify_solutions()
+    exec()
 

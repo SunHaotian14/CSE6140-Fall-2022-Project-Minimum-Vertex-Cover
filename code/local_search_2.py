@@ -1,7 +1,11 @@
+"""
+This file contains the implementation of our second choice of Local Search (LS) algorithm for MVC.
+We choose to implement the Hill Climbing (HC) algorithm.
+"""
+
 import numpy as np
 import time
 import heapq
-#from io_utils import load_graph
 
 def local_search_2(graph, seed, cutoff_time):
 
@@ -54,7 +58,6 @@ def local_search_2(graph, seed, cutoff_time):
     while((time.time() - start_time) < cutoff_time):
         # every iteration, delete the node with lowest degree
         if len(heap)==0:
-            #print("Heap empty")
             return convert_to_set(covered_nodes), trace
         min_node = heapq.heappop(heap)[1]
         if covered_nodes[min_node-1] == 0:
@@ -65,9 +68,5 @@ def local_search_2(graph, seed, cutoff_time):
             covered_nodes[min_node-1] = 1 #restore
         else:
             trace.append((time.time()-start_time, np.sum(covered_nodes)))
-        #print(np.sum(covered_nodes))
     print("Timeout!")
     return convert_to_set(covered_nodes), trace
-
-#G = load_graph('as-22july06.graph')
-#print(local_search_2(G,1,1000))

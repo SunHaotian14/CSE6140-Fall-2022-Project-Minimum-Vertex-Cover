@@ -1,7 +1,10 @@
+"""
+This file contains the implementation of our first choice of Local Search (LS) algorithm for MVC.
+We choose to implement the Simulated Annealing (SA) algorithm.
+"""
 import time
 import random
 import math
-
 
 def local_search_1(graph, seed, cutoff_time, T0_P=None):
     """
