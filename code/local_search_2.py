@@ -3,7 +3,7 @@ import time
 import heapq
 #from io_utils import load_graph
 
-def local_search_2(graph, initialize_ratio, seed, cutoff_time):
+def local_search_2(graph, seed, cutoff_time):
 
     def check_cover(covered_nodes, graph):
         for edge in graph.get_edges_set():
@@ -17,9 +17,20 @@ def local_search_2(graph, initialize_ratio, seed, cutoff_time):
             if l: result.add(i+1)
         return result
 
+
+
     np.random.seed(seed)
     nodes = graph.get_vertices_set()
     nodes_num = graph.get_num_nodes()
+
+    # set up different init ratio for network size
+    initialize_ratio = 0
+    if nodes_num < 200:
+        initialize_ratio = 0.05
+    elif nodes_num < 2000:
+        initialize_ratio = 0.02
+    else:
+        initialize_ratio = 0.01
 
     max_init_iter = 1000
     i = 0
@@ -59,5 +70,5 @@ def local_search_2(graph, initialize_ratio, seed, cutoff_time):
     print("Timeout!")
     return convert_to_set(covered_nodes), trace
 
-#G = load_graph('football.graph')
-#print(local_search_2(G,0.02,1,1000))
+#G = load_graph('as-22july06.graph')
+#print(local_search_2(G,1,1000))
