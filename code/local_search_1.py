@@ -11,7 +11,10 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
         local search 1：Simulated Annealing
     """
     def cost_f(num_uncov, num_node):
-        """ bigger cost -> worse candidate """
+        """ 
+            evaluation function 
+            score = 5 * number of uncovered edge + number of covered node
+        """
         return 5 * num_uncov + num_node
 
     def prob(gap, t):
@@ -20,6 +23,7 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
         return p
 
     def empty_init(graph):
+        """ initialization: an empty vertex set """
         all_nodes = graph.get_vertices_set()
         uncov = set()
         cov = set()
@@ -30,12 +34,14 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
         return uncov, cov
 
     def full_init(graph):
+        """ initialization: a full vertex set """
         all_nodes = graph.get_vertices_set()
         cov = set(list(all_nodes))
         uncov = set()
         return uncov, cov
 
     def random_init(graph, p=0.3):
+        """ initialization: a vertex set formed randomly """
         all_nodes = graph.get_vertices_set()
         num = (1 - p) * len(all_nodes)
         tmp = set(random.sample(all_nodes, int(num)))  # 70% nodes as uncovered
@@ -51,18 +57,20 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
     random.seed(seed)
 
     alpha = 0.99  # temp decrease rate
-    Tmin = 1e-3
+    Tmin = 1e-3  # min t
     inner_round = 150
 
     all_nodes, original_v = graph.get_vertices_set(), graph.get_vertices_set()
     num_whole_edge = graph.get_num_edges()
     num_whole_node = graph.get_num_nodes()
+    # get initial temperature
     if T0_P is None:
         T0 = num_whole_edge * 200 + 1000
     else:
         T0 = num_whole_edge * T0_P + 1000
     T = T0
 
+    # initialization
     uncov, cov = empty_init(graph)
     score = cost_f(len(uncov), len(cov))
     best_score = score
@@ -93,6 +101,7 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
             # evaluate candidate
             former_score = score
             score = cost_f(len(uncov), len(cov))
+            # decide whether to update solution
             update = True
             if score > former_score:
                 gap = score - former_score
@@ -102,7 +111,8 @@ def local_search_1(graph, seed, cutoff_time, T0_P=None):
             if not update:
                 # back to last step
                 cov, uncov, score = former_cov, former_uncov, former_score
-
+            
+            # form a vertex set
             if not len(uncov):
                 if score < best_score:
                     best_score = score
